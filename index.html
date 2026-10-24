@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penyesalan Terdalam Hatiku... | Penyesalanku Untukmu</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        burgundy: '#4a0e17',
+                        deepBurgundy: '#2b050b',
+                        duskPurple: '#2d1b2e',
+                        softRose: '#ffb3c1',
+                        blushPink: '#ffe5ec',
+                        roseGold: '#c97b84',
+                        glowRed: '#ff4d6d'
+                    },
+                    fontFamily: {
+                        cinzel: ['"Cinzel"', 'serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                        cursive: ['"Dancing Script"', 'cursive'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Ambient Background with Dusk Gradient */
+        body {
+            background: linear-gradient(135deg, #1f080c 0%, #2d1b2e 35%, #4a0e17 75%, #180306 100%);
+            min-height: 100vh;
+            color: #ffe5ec;
+            overflow-x: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Background Particle Canvas Overlay */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-card {
+            background: rgba(45, 27, 46, 0.45);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 179, 193, 0.18);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+        }
+
+        .glass-nav {
+            background: rgba(31, 8, 12, 0.75);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255, 179, 193, 0.15);
+        }
+
+        /* Glowing Text Effects */
+        .glow-title {
+            text-shadow: 0 0 20px rgba(255, 77, 109, 0.4), 0 0 40px rgba(201, 123, 132, 0.2);
+        }
+
+        .glow-box {
+            box-shadow: 0 0 25px rgba(201, 123, 132, 0.25);
+        }
+
+        /* 3D Envelope Styles */
+        .envelope-wrapper {
+            perspective: 1200px;
+        }
+
+        .envelope {
+            width: 320px;
+            height: 220px;
+            position: relative;
+            background-color: #3d121a;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 20px rgba(201, 123, 132, 0.2);
+            cursor: pointer;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            border: 1px solid rgba(255, 179, 193, 0.2);
+        }
+
+        @media (min-width: 640px) {
+            .envelope {
+                width: 480px;
+                height: 300px;
+            }
+        }
+
+        .envelope:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 77, 109, 0.3);
+        }
+
+        .envelope .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 130px solid #4a0e17;
+            transform-origin: top;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.2s, z-index 0.2s;
+            z-index: 4;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+        }
+
+        @media (min-width: 640px) {
+            .envelope .flap {
+                border-left: 240px solid transparent;
+                border-right: 240px solid transparent;
+                border-top: 180px solid #4a0e17;
+            }
+        }
+
+        .envelope .pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid #3d121a;
+            border-right: 160px solid #3d121a;
+            border-bottom: 110px solid #2b050b;
+            border-radius: 0 0 12px 12px;
+            z-index: 3;
+        }
+
+        @media (min-width: 640px) {
+            .envelope .pocket {
+                border-left: 240px solid #3d121a;
+                border-right: 240px solid #3d121a;
+                border-bottom: 155px solid #2b050b;
+            }
+        }
+
+        .envelope .letter {
+            position: absolute;
+            bottom: 10px;
+            left: 4%;
+            width: 92%;
+            height: 90%;
+            background: #fff8f0;
+            color: #2b050b;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+            overflow-y: auto;
+            border: 1px solid #e0c3fc;
+        }
+
+        .envelope.open .flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .envelope.open .letter {
+            transform: translateY(-150px) scale(1.05);
+            z-index: 5;
+            height: auto;
+            max-height: 520px;
+        }
+
+        @media (min-width: 640px) {
+            .envelope.open .letter {
+                transform: translateY(-190px) scale(1.06);
+            }
+        }
+
+        .seal {
+            position: absolute;
+            top: 105px;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #c9184a, #590d22);
+            border: 2px solid rgba(255, 179, 193, 0.4);
+            border-radius: 50%;
+            color: #ffe5ec;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 5;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        @media (min-width: 640px) {
+            .seal {
+                top: 140px;
+                width: 56px;
+                height: 56px;
+            }
+        }
+
+        .envelope.open .seal {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5);
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar for Letter */
+        .letter::-webkit-scrollbar {
+            width: 5px;
+        }
+        .letter::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .letter::-webkit-scrollbar-thumb {
+            background: #c97b84;
+            border-radius: 4px;
+        }
+
+        /* Pulse Animation */
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+        .animate-heartbeat {
+            animation: heartbeat 2.5s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="relative">
+
+    <!-- Background Particle & Petals Canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Navigation Header -->
+    <nav class="fixed top-0 left-0 w-full z-50 glass-nav px-4 sm:px-8 py-3.5 flex justify-between items-center shadow-lg">
+        <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-heart text-glowRed animate-pulse"></i>
+            <span class="font-cinzel tracking-widest text-blushPink font-semibold text-xs sm:text-sm uppercase">Penyesalan Hatiku</span>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button id="musicToggleBtn" class="flex items-center space-x-2 bg-burgundy/80 hover:bg-burgundy text-softRose px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium transition border border-roseGold/30 shadow">
+                <i id="musicIcon" class="fa-solid fa-volume-xmark text-glowRed"></i>
+                <span id="musicText">Putar Melodi 🎵</span>
+            </button>
+            <button onclick="openCustomizerModal()" class="bg-white/10 hover:bg-white/20 text-softRose p-2 rounded-full text-xs sm:text-sm transition border border-white/10" title="Edit Pesan & Nama">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+        </div>
+    </nav>
+
+
+    <!-- HERO SECTION -->
+    <section class="min-h-screen flex flex-col justify-center items-center text-center px-4 pt-24 pb-16 relative z-10">
+        <div class="max-w-3xl mx-auto space-y-6">
+            <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-burgundy/60 backdrop-blur-md text-softRose font-medium text-xs sm:text-sm border border-roseGold/30 shadow-md">
+                <i class="fa-solid fa-hands-praying text-glowRed"></i>
+                <span>Ungkapan Penyesalan Terdalam</span>
+            </div>
+            
+            <h1 class="text-3xl sm:text-5xl md:text-6xl font-serif font-bold text-blushPink glow-title leading-tight">
+                Untukmu, <span id="displayPartnerHero" class="font-cursive text-softRose font-normal">Pemilik Hatiku</span>...
+            </h1>
+
+            <!-- Typing Effect Container -->
+            <div class="min-h-[90px] flex items-center justify-center">
+                <p id="typingText" class="text-base sm:text-lg md:text-xl text-softRose/90 font-light max-w-2xl italic leading-relaxed">
+                    <!-- Typing effect injects text here -->
+                </p>
+            </div>
+
+            <div class="pt-4">
+                <a href="#envelopeSection" class="inline-flex items-center space-x-3 bg-gradient-to-r from-burgundy via-glowRed to-burgundy hover:brightness-125 text-white font-medium px-8 py-4 rounded-full shadow-2xl transition transform hover:-translate-y-1 active:translate-y-0 duration-300 border border-roseGold/40 glow-box">
+                    <span>Buka Surat Dari Hatiku</span>
+                    <i class="fa-solid fa-envelope-open text-lg"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <a href="#envelopeSection" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-softRose/50 hover:text-softRose animate-bounce p-2 transition">
+            <i class="fa-solid fa-chevron-down text-xl"></i>
+        </a>
+    </section>
+
+
+    <!-- INTERACTIVE ENVELOPE / LETTER SECTION -->
+    <section id="envelopeSection" class="min-h-screen flex flex-col justify-center items-center px-4 py-20 relative z-10">
+        <div class="text-center mb-10 max-w-lg">
+            <span class="text-xs uppercase tracking-widest text-glowRed font-cinzel">Rasa Bersalah & Ketulusan</span>
+            <h2 class="text-3xl sm:text-4xl font-serif font-bold text-blushPink mt-1">Surat Permohonan Maaf</h2>
+            <p class="text-xs sm:text-sm text-softRose/70 mt-2">Sentuh/klik amplop di bawah ini untuk membaca seluruh penyesalanku</p>
+        </div>
+
+        <div class="envelope-wrapper my-6">
+            <div class="envelope" id="envelope" onclick="toggleEnvelope()">
+                <div class="flap"></div>
+                <div class="pocket"></div>
+                <div class="seal">
+                    <i class="fa-solid fa-heart text-lg"></i>
+                </div>
+                
+                <!-- PARCHMENT LETTER CONTENT -->
+                <div class="letter text-left">
+                    <div class="border-b border-roseGold/30 pb-3 mb-4 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs text-burgundy/60 uppercase tracking-widest block font-sans">Dengan Jiwa Yang Menyesal,</span>
+                            <span class="font-serif font-bold text-xl text-burgundy">Kepada: <span id="displayPartnerLetter" class="text-glowRed">Sayangku</span></span>
+                        </div>
+                        <i class="fa-solid fa-rose text-glowRed text-2xl opacity-80"></i>
+                    </div>
+
+                    <div id="displayLetterBody" class="text-xs sm:text-sm leading-relaxed space-y-4 font-sans text-gray-800">
+                        <p class="first-letter:text-3xl first-letter:font-serif first-letter:text-burgundy first-letter:mr-1">
+                            Aku menulis surat ini dengan dada yang terasa begitu sesak oleh rasa bersalah yang teramat sangat. Tidak ada alasan, tidak ada pembenaran atas kekhilafan dan kebodohanku yang telah melukai hatimu yang begitu suci dan tulus.
+                        </p>
+                        <p>
+                            Melihatmu kecewa dan tersakiti karena perbuatanku adalah siksaan terberat bagi jiwaku sendiri. Aku sadar betapa tidak pekanya aku, betapa egoisnya diriku saat itu, hingga lupa bahwa dirimu adalah anugerah terindah yang harusnya kujaga dengan seluruh jiwa ragaku.
+                        </p>
+                        <p>
+                            Jujur, aku sangat takut... takut jika ketololanku ini membuatmu ragu atau berpaling dari kita. Aku sungguh tidak bisa membayangkan hidup tanpa hangatnya senyummu dan lembutnya perhatianmu. Kamu adalah semestaku, dan aku telah merusaknya.
+                        </p>
+                        <p>
+                            Dari lubuk hatiku yang paling dalam, aku mohon ampunan padamu. Aku siap menerima segala amarahmu, dan aku berjanji sekuat tenagaku untuk memperbaiki setiap jengkal kesalahanku agar tak pernah terulang kembali.
+                        </p>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-roseGold/30 text-right">
+                        <p class="text-xs text-gray-500 italic">Yang bersimpuh memohon maafmu,</p>
+                        <p id="displaySenderLetter" class="font-cursive text-2xl font-bold text-burgundy mt-1">Dari Pasanganmu Yang Sangat Menyesal</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-xs text-softRose/50 italic mt-8 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-info"></i> Klik amplop kembali jika ingin merapatkannya
+        </p>
+    </section>
+
+
+    <!-- TIMELINE PENYESALAN & JANJI TULUS -->
+    <section class="max-w-5xl mx-auto px-4 py-16 relative z-10">
+        <div class="text-center mb-14">
+            <span class="text-xs uppercase tracking-widest text-glowRed font-cinzel">Refleksi Diri</span>
+            <h2 class="text-3xl sm:text-4xl font-serif font-bold text-blushPink mt-1">Kesadaran & Janji Tulusku</h2>
+            <p class="text-sm text-softRose/70 mt-2 max-w-md mx-auto">Proses pembuktian bahwa aku sungguh-sungguh belajar dari kesalahan besar ini</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 transition transform hover:-translate-y-2 duration-300 border border-white/10 relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 text-glowRed/10 text-8xl transition transform group-hover:scale-110">
+                    <i class="fa-solid fa-heart-crack"></i>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-burgundy/80 flex items-center justify-center text-glowRed text-xl mb-5 border border-roseGold/30 shadow">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h3 id="displayCardTitle1" class="font-serif font-bold text-lg text-blushPink mb-3">Penyesalan Terbesarku</h3>
+                <p id="displayCardText1" class="text-xs sm:text-sm text-softRose/80 leading-relaxed font-light">
+                    Menyadari bahwa perkataan dan perbuatanku telah menorehkan luka di hatimu. Rasa bersalah ini membuatku tak bisa tenang karena tahu aku telah mengecewakan orang yang paling kucintai.
+                </p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 transition transform hover:-translate-y-2 duration-300 border border-white/10 relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 text-glowRed/10 text-8xl transition transform group-hover:scale-110">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-burgundy/80 flex items-center justify-center text-glowRed text-xl mb-5 border border-roseGold/30 shadow">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <h3 id="displayCardTitle2" class="font-serif font-bold text-lg text-blushPink mb-3">Apa Yang Aku Pelajari</h3>
+                <p id="displayCardText2" class="text-xs sm:text-sm text-softRose/80 leading-relaxed font-light">
+                    Ego dan emosi sesaat hanya membawa kehancuran. Aku belajar bahwa mendengarkanmu dengan empati dan menjaga perasaanmu jauh lebih berharga dari apa pun di dunia ini.
+                </p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 transition transform hover:-translate-y-2 duration-300 border border-white/10 relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 text-glowRed/10 text-8xl transition transform group-hover:scale-110">
+                    <i class="fa-solid fa-hand-holding-heart"></i>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-burgundy/80 flex items-center justify-center text-glowRed text-xl mb-5 border border-roseGold/30 shadow">
+                    <i class="fa-solid fa-shield-heart"></i>
+                </div>
+                <h3 id="displayCardTitle3" class="font-serif font-bold text-lg text-blushPink mb-3">Komitmen Janjiku</h3>
+                <p id="displayCardText3" class="text-xs sm:text-sm text-softRose/80 leading-relaxed font-light">
+                    Aku berjanji akan lebih terbuka, menurunkan ego, berkomunikasi dengan penuh kelembutan, dan senantiasa menjadi tempat yang aman & membahagiakan bagi hatimu.
+                </p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- INTERACTIVE DECISION / APOLOGY BUTTONS -->
+    <section class="max-w-3xl mx-auto px-4 py-20 text-center relative z-10">
+        <div class="glass-card rounded-3xl p-8 sm:p-14 border border-roseGold/30 shadow-2xl relative overflow-hidden">
+            <div class="inline-block p-4 rounded-full bg-burgundy/80 text-glowRed text-3xl mb-4 border border-roseGold/30 animate-heartbeat">
+                <i class="fa-solid fa-hands-holding-child"></i>
+            </div>
+            
+            <h2 class="text-2xl sm:text-4xl font-serif font-bold text-blushPink mb-3">Sudikah Kamu Memaafkanku?</h2>
+            <p class="text-xs sm:text-sm text-softRose/80 mb-10 max-w-md mx-auto leading-relaxed">
+                Pintu maafmu adalah mukjizat terindah yang sangat aku harapkan saat ini...
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-5 min-h-[140px] relative" id="buttonContainer">
+                <!-- YES BUTTON -->
+                <button id="yesBtn" onclick="acceptApology()" class="w-full sm:w-auto bg-gradient-to-r from-glowRed via-burgundy to-glowRed hover:brightness-125 text-white font-semibold text-base sm:text-lg px-9 py-4 rounded-full shadow-xl transition-all duration-300 z-20 border border-roseGold/40 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-heart"></i>
+                    <span>Ya, Aku Memaafkanmu ❤️</span>
+                </button>
+
+                <!-- DODGING / SENSITIVE NO BUTTON -->
+                <button id="noBtn" onmouseover="dodgeButton()" onclick="dodgeButton()" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-softRose font-medium text-sm sm:text-base px-7 py-4 rounded-full shadow border border-white/20 transition-all duration-200 z-10 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                    <span id="noBtnText">Butuh Waktu / Belum... 🥺</span>
+                </button>
+            </div>
+
+            <!-- Soft Message for Waiting -->
+            <p id="patienceNotice" class="text-xs text-softRose/60 italic mt-6 hidden transition">
+                <i class="fa-solid fa-heart-pulse mr-1"></i> Tidak apa-apa sayang, berapa pun lamanya, aku akan setia menunggu hatimu tenang...
+            </p>
+        </div>
+    </section>
+
+
+    <!-- SUCCESS CELEBRATION MODAL -->
+    <div id="successModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden transition-all duration-300">
+        <div class="glass-card bg-duskPurple/95 rounded-3xl p-8 sm:p-12 max-w-lg w-full text-center shadow-2xl border border-roseGold/40 transform scale-95 transition-transform duration-300">
+            <div class="w-20 h-20 mx-auto bg-burgundy rounded-full flex items-center justify-center text-glowRed text-4xl mb-5 border border-roseGold/40 animate-bounce">
+                <i class="fa-solid fa-face-smile-beam"></i>
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-serif font-bold text-blushPink mb-3">Terima Kasih, Ketulusan Hatimu! 💖</h3>
+            <p class="text-xs sm:text-sm text-softRose/90 mb-8 leading-relaxed font-light">
+                Mata dan hatiku meneteskan air mata bahagia. Terima kasih telah memberiku kesempatan kedua. Janji ini akan kubuktikan dengan segenap jiwa ragaku untuk senantiasa membahagiakanmu.
+            </p>
+            <button onclick="closeSuccessModal()" class="w-full bg-gradient-to-r from-glowRed to-burgundy text-white font-medium py-3.5 rounded-full shadow-lg hover:brightness-110 transition border border-roseGold/40 text-sm">
+                Peluk Erat Sayangku 🤗
+            </button>
+        </div>
+    </div>
+
+
+    <!-- EDIT / CUSTOMIZER MODAL -->
+    <div id="editModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-card bg-duskPurple/95 rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-roseGold/40 text-blushPink">
+            <div class="flex justify-between items-center mb-5 border-b border-roseGold/20 pb-3">
+                <h3 class="font-serif font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-glowRed"></i> Personalasi Pesan Maaf
+                </h3>
+                <button onclick="closeCustomizerModal()" class="text-softRose/60 hover:text-softRose"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="space-y-4 text-xs sm:text-sm">
+                <div>
+                    <label class="block font-medium mb-1.5 text-softRose">Nama Pasangan:</label>
+                    <input type="text" id="inputPartner" class="w-full px-3.5 py-2.5 bg-burgundy/60 border border-roseGold/30 rounded-xl text-blushPink focus:outline-none focus:border-glowRed" placeholder="Misal: Adelia / Cintaku">
+                </div>
+                <div>
+                    <label class="block font-medium mb-1.5 text-softRose">Nama Pengirim:</label>
+                    <input type="text" id="inputSender" class="w-full px-3.5 py-2.5 bg-burgundy/60 border border-roseGold/30 rounded-xl text-blushPink focus:outline-none focus:border-glowRed" placeholder="Misal: Budi / Pasanganmu">
+                </div>
+                <div>
+                    <label class="block font-medium mb-1.5 text-softRose">Isi Surat Permohonan Maaf:</label>
+                    <textarea id="inputLetter" rows="5" class="w-full px-3.5 py-2.5 bg-burgundy/60 border border-roseGold/30 rounded-xl text-blushPink focus:outline-none focus:border-glowRed" placeholder="Tuliskan ungkapan rasa bersalah dan penyesalanmu..."></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="closeCustomizerModal()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 font-medium text-xs text-softRose">Batal</button>
+                <button onclick="saveCustomization()" class="px-5 py-2 rounded-xl bg-glowRed hover:bg-burgundy text-white font-medium text-xs shadow border border-roseGold/30 transition">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- FOOTER -->
+    <footer class="text-center py-8 text-xs text-softRose/40 relative z-10 border-t border-white/5 mt-10">
+        <p>Ungkapan penyesalan dan ketulusan hati yang tak terhingga ❤️</p>
+    </footer>
+
+
+    <!-- JAVASCRIPT CODE -->
+    <script>
+        /* ----------------------------------------------------
+           1. TYPING EFFECT FOR HERO SECTION
+        ---------------------------------------------------- */
+        const textToType = "Aku datang membawa luka yang kuperbuat sendiri, dan hanya kerendahan hati yang tersisa untuk memohon ampunan dari ketulusan hatimu...";
+        let typingIdx = 0;
+        const typingSpeed = 45;
+
+        function typeWriter() {
+            const container = document.getElementById('typingText');
+            if (typingIdx < textToType.length) {
+                container.innerHTML += textToType.charAt(typingIdx);
+                typingIdx++;
+                setTimeout(typeWriter, typingSpeed);
+            }
+        }
+        window.addEventListener('load', typeWriter);
+
+
+        /* ----------------------------------------------------
+           2. CANVASES: FALLING ROSE PETALS & DIM LIGHT EFEK
+        ---------------------------------------------------- */
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        class Petal {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * -height;
+                this.size = Math.random() * 9 + 5;
+                this.speedY = Math.random() * 1.2 + 0.6;
+                this.speedX = Math.random() * 0.8 - 0.4;
+                this.angle = Math.random() * 360;
+                this.spin = (Math.random() - 0.5) * 0.02;
+                this.opacity = Math.random() * 0.5 + 0.25;
+                // Dark red / Rose colors matching regret theme
+                const colors = ['#ff4d6d', '#c9184a', '#800f2f', '#a4133c', '#ffb3c1'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.isLight = Math.random() > 0.8;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += Math.sin(this.angle) * 0.6;
+                this.angle += this.spin;
+
+                if (this.y > height + 20) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.globalAlpha = this.opacity;
+
+                if (this.isLight) {
+                    // Soft floating glow particle
+                    ctx.fillStyle = '#ffe5ec';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size / 4, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Rose Petal Shape
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.bezierCurveTo(-this.size, -this.size, -this.size, this.size, 0, this.size * 1.4);
+                    ctx.bezierCurveTo(this.size, this.size, this.size, -this.size, 0, 0);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        const petals = Array.from({ length: 50 }, () => new Petal());
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            petals.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+
+        /* ----------------------------------------------------
+           3. WEB AUDIO SYNTH: MELANCHOLIC SOFT PIANO
+        ---------------------------------------------------- */
+        let audioCtx = null;
+        let isPlaying = false;
+        let musicTimer = null;
+
+        const musicBtn = document.getElementById('musicToggleBtn');
+        const musicIcon = document.getElementById('musicIcon');
+        const musicText = document.getElementById('musicText');
+
+        // Melancholic/romantic minor progression notes (Freq in Hz)
+        const melancholicNotes = [
+            220.00, // A3
+            261.63, // C4
+            329.63, // E4
+            392.00, // G4
+            174.61, // F3
+            220.00, // A3
+            261.63, // C4
+            349.23, // F4
+            196.00, // G3
+            246.94, // B3
+            293.66  // D4
+        ];
+        let noteIdx = 0;
+
+        function playSoftTone(freq, duration = 3.5) {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                // Attack and smooth release
+                gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.12, audioCtx.currentTime + 0.2);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) { console.log(e); }
+        }
+
+        function startMusic() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            isPlaying = true;
+            musicText.innerText = "Melodi Aktif 🎶";
+            musicIcon.className = "fa-solid fa-volume-high text-glowRed animate-pulse";
+
+            musicTimer = setInterval(() => {
+                playSoftTone(melancholicNotes[noteIdx], 3.5);
+                // Dual chord sound
+                if (noteIdx % 2 === 0) {
+                    playSoftTone(melancholicNotes[(noteIdx + 2) % melancholicNotes.length] * 0.5, 4.0);
+                }
+                noteIdx = (noteIdx + 1) % melancholicNotes.length;
+            }, 1400);
+        }
+
+        function stopMusic() {
+            isPlaying = false;
+            clearInterval(musicTimer);
+            musicText.innerText = "Putar Melodi 🎵";
+            musicIcon.className = "fa-solid fa-volume-xmark text-glowRed";
+        }
+
+        musicBtn.addEventListener('click', () => {
+            if (isPlaying) stopMusic();
+            else startMusic();
+        });
+
+
+        /* ----------------------------------------------------
+           4. ENVELOPE INTERACTION & AUDIO TRIGGER
+        ---------------------------------------------------- */
+        function toggleEnvelope() {
+            const env = document.getElementById('envelope');
+            env.classList.toggle('open');
+
+            if (!isPlaying) {
+                startMusic();
+            }
+        }
+
+
+        /* ----------------------------------------------------
+           5. DODGING & PATIENT "BELUM" BUTTON
+        ---------------------------------------------------- */
+        let dodgeCount = 0;
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const patienceNotice = document.getElementById('patienceNotice');
+
+        function dodgeButton() {
+            dodgeCount++;
+            patienceNotice.classList.remove('hidden');
+
+            // Dodge position calculation
+            const x = (Math.random() - 0.5) * 240;
+            const y = (Math.random() - 0.5) * 140;
+
+            noBtn.style.transform = `translate(${x}px, ${y}px)`;
+
+            // YES Button gently expands
+            const currentScale = 1 + (dodgeCount * 0.08);
+            yesBtn.style.transform = `scale(${Math.min(currentScale, 1.4)})`;
+
+            const patientResponses = [
+                "Aku mengerti... 🥺",
+                "Take your time, sayang...",
+                "Aku akan tetap di sini...",
+                "Maafkan kekhilafanku...",
+                "Aku takkan menyerah memohon maafmu..."
+            ];
+
+            document.getElementById('noBtnText').innerText = patientResponses[Math.min(dodgeCount - 1, patientResponses.length - 1)];
+        }
+
+
+        /* ----------------------------------------------------
+           6. CELEBRATION & MODAL
+        ---------------------------------------------------- */
+        function acceptApology() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 120,
+                    spread: 90,
+                    origin: { y: 0.6 },
+                    colors: ['#ff4d6d', '#c9184a', '#ffb3c1', '#ffffff']
+                });
+
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 60,
+                        angle: 60,
+                        spread: 60,
+                        origin: { x: 0 }
+                    });
+                    confetti({
+                        particleCount: 60,
+                        angle: 120,
+                        spread: 60,
+                        origin: { x: 1 }
+                    });
+                }, 300);
+            }
+
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+
+        /* ----------------------------------------------------
+           7. CUSTOMIZER MODAL LOGIC
+        ---------------------------------------------------- */
+        function openCustomizerModal() {
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('inputPartner').value = document.getElementById('displayPartnerHero').innerText;
+            document.getElementById('inputSender').value = document.getElementById('displaySenderLetter').innerText;
+        }
+
+        function closeCustomizerModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function saveCustomization() {
+            const partner = document.getElementById('inputPartner').value.trim();
+            const sender = document.getElementById('inputSender').value.trim();
+            const letter = document.getElementById('inputLetter').value.trim();
+
+            if (partner) {
+                document.getElementById('displayPartnerHero').innerText = partner;
+                document.getElementById('displayPartnerLetter').innerText = partner;
+            }
+
+            if (sender) {
+                document.getElementById('displaySenderLetter').innerText = sender;
+            }
+
+            if (letter) {
+                const paragraphs = letter.split('\n').filter(p => p.trim() !== '');
+                const formattedHtml = paragraphs.map(p => `<p>${p}</p>`).join('');
+                document.getElementById('displayLetterBody').innerHTML = formattedHtml;
+            }
+
+            closeCustomizerModal();
+        }
+    </script>
+</body>
+</html>
